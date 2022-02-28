@@ -1,7 +1,7 @@
 *.log
 .DS_Store
 node_modules
-.cache
+.parcel-cache
 dist
 examples/__examples.jsx
 examples/__examples.html
