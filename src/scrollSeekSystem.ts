@@ -16,9 +16,33 @@ export const scrollSeekSystem = u.system(
         u.filter(([_, config]) => !!config),
         u.map(([speed, config, isSeeking, range]) => {
           const { exit, enter } = config as ScrollSeekConfiguration
+
+          // const debounceBoolean = debounce((arg) => arg, 5000)
+          // console.time('debounce')
+          // const debounced = await debounceBoolean(true)
+          // console.log('d', debounced)
+
+          // const debounceFunction = debounce((arg) => arg, 5000)
+
           if (isSeeking) {
             if (exit(speed, range)) {
-              return false
+              let isExiting = false
+              console.time('debounce')
+              function toggle() {
+                isExiting = !isExiting
+                console.log('isExiting', isExiting)
+                console.timeEnd('debounce')
+              }
+              setTimeout(toggle, 1000)
+
+              function checkStatus() {
+                console.log('checkStatus', isExiting)
+                if (!isExiting) {
+                  setTimeout(checkStatus, 1000)
+                }
+                return true
+              }
+              return checkStatus()
             }
           } else {
             if (enter(speed, range)) {
@@ -42,3 +66,18 @@ export const scrollSeekSystem = u.system(
   u.tup(stateFlagsSystem),
   { singleton: true }
 )
+
+export function debounce(func, wait: number) {
+  let timeout: number | undefined
+
+  return async (...args) => {
+    if (timeout) {
+      clearTimeout(timeout)
+    }
+    timeout = setTimeout(() => {
+      console.timeEnd('debounce')
+      console.log('a', func(...args))
+      return func(...args)
+    }, wait)
+  }
+}
